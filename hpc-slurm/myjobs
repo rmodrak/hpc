@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+jobs=$(squeue --user rmodrak -o "%10i %34j %4t %8M %20N" --noheader | \
+    awk '{print $1}' | \
+    tr '\n' ' ')
+
+elif [ $# -eq 1 ]; then
+jobs=$(squeue --user rmodrak -o "%10i %34j %4t %8M %20N" --noheader | \
+    grep $1 | \
+    awk '{print $1}' | \
+    tr '\n' ' ')
+
+fi
+
+echo "$jobs"
+
+    

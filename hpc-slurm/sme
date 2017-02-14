@@ -1,0 +1,5 @@
+#!/bin/bash
+
+squeue --user rmodrak -o "%10i %34j %4t %8M %20N" --noheader
+echo
+

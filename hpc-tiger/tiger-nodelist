@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# PBS_NODES_ALL
+# list all nodes on cluster
+
+# check input arguments
+if [ $# -eq 0 ]; then
+   echo "USAGE: ${0##*/} CLUSTERNAME"
+   exit
+fi
+
+case $1 in
+
+tiger)
+  for (( ir=1 ; ir<=9 ; ir++ )) ; do
+    for (( ic=1 ; ic<=4 ; ic++ )) ; do
+      for (( in=1 ; in<=16 ; in++ )); do
+         echo r${ir}c${ic}n${in}
+      done
+    done
+  done 
+  for (( ir=10 ; ir<=10 ; ir++ )) ; do
+    for (( ic=1 ; ic<=1 ; ic++ )) ; do
+      for (( in=1 ; in<=16 ; in++ )); do
+	echo r${ir}c${ic}n${in}
+	   done
+       done
+  done
+  for (( ir=11 ; ir<=14 ; ir++ )) ; do
+    for (( in=1 ; in<=16 ; in++ )); do
+      echo r${ir}n${in}
+    done
+  done
+  ;;
+
+*)
+  echo "bad command"
+  exit
+  ;;
+
+esac
+

@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# SCRATCH
+# perform operations on scratch directories
+
+CLUSTER="tiger" # default cluster
+
+# check input
+if [ $# -eq 0 ]; then
+   echo "USAGE: ${0##*/} OPTION [NODELIST]"
+   exit
+
+elif [ $# -eq 1 ]; then
+  nodes=$( nodes $CLUSTER )
+
+else
+  nodes=$( echo $* | tr ' ' '\n' | uniq )
+
+fi
+
+case $1 in
+
+list)
+  # list scratch directories on nodes
+  for node in $nodes
+  do
+    echo $node
+    ssh $node ls /scratch/rmodrak 2> /dev/null
+    echo ''
+  done
+  ;;
+
+rm)
+  # print warning
+  nn=$( echo "$nodes" | wc --words )
+  echo ""
+  echo "About to delete scratch directories on $nn nodes"
+  echo ""
+  echo "Waiting 5 seconds before starting..."
+  echo ""
+  sleep 5
+
+  # delete scratch directories
+  echo "Starting..."
+  echo ""
+
+  for node in $nodes
+  do
+    echo $node
+    ssh $node rm -rf /scratch/rmodrak &> /dev/null &
+  done
+  wait
+  ;;
+
+df)
+  # check disk space
+  for node in $nodes
+  do
+      printf "%-7s %s\n" $node `ssh $node df -h 2> /dev/null | grep sda3 | awk '{print $5}'` &
+  done
+  wait
+  ;;
+
+*)
+  echo "bad command"
+  exit
+
+esac
+
