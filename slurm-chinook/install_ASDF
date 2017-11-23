@@ -1,0 +1,96 @@
+#!/bin/bash -e
+
+# INSTALLS DATA PROCESSING SUITE ON CHINOOK
+
+# Ryan Modrak
+# Last modified: 20171122
+
+
+# adjust to match your preferred location
+VENV="$HOME/virtual/ASDF"
+if [ -e $VENV ]; then
+    echo "Directory exists: $VENV"
+    exit
+fi
+
+# create and load virtual environment
+module load lang/Python/2.7.12-pic-intel-2016b
+virtualenv $VENV
+mkdir -p "$VENV/editable"
+source "$VENV/bin/activate"
+
+PYFLEX="$VENV/editable/pyflex"
+PYADJOINT="$VENV/editable/pyadjoint"
+SPACEWEIGHT="$VENV/editable/spaceweight"
+PYTOMO3D="$VENV/editable/pytomo3d"
+PYASDF="$VENV/packages/pyasdf"
+PYPAW="$VENV/editable/pypaw"
+H5PY="$VENV/packages/h5py"
+HDF5="/u1/uaf/rmodrak/opt/hdf5"
+
+GIT_ORG="git@github.com:computational-seismology"
+PYFLEX_REMOTE="${GIT_ORG}/pyflex --branch devel"
+PYADJOINT_REMOTE="${GIT_ORG}/pyadjoint"
+SPACEWEIGHT_REMOTE="https://github.com/wjlei1990/spaceweight"
+PYTOMO3D_REMOTE="${GIT_ORG}/pytomo3d"
+PYASDF_REMOTE="https://github.com/SeismicData/pyasdf"
+PYPAW_REMOTE="${GIT_ORG}/pypaw"
+H5PY_REMOTE="https://github.com/h5py/h5py"
+
+
+# install obspy
+pip install obspy==1.0.3
+
+# install data processing suite
+git clone $PYFLEX_REMOTE $PYFLEX
+cd $PYFLEX
+pip install -v -e .
+
+git clone $PYADJOINT_REMOTE $PYADJOINT
+cd $PYADJOINT
+pip install -v -e .
+
+git clone $SPACEWEIGHT_REMOTE $SPACEWEIGHT
+cd $SPACEWEIGHT
+pip install -v -e .
+
+git clone $PYTOMO3D_REMOTE $PYTOMO3D
+cd $PYTOMO3D
+pip install -v -e .
+
+# install mpi4py
+pip install mpi4py==1.3.1
+
+# install h5py
+git clone $H5PY_REMOTE $H5PY
+cd $H5PY
+export CC=mpicc
+python setup.py configure --mpi
+python setup.py configure --hdf5=$HDF5
+python setup.py build
+python setup.py install
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HDF5/lib
+
+# install ASDF suite
+git clone https://github.com/SeismicData/pyasdf $PYASDF
+cd $PYASDF
+pip install -v -e .
+
+git clone $PYPAW_REMOTE $PYPAW
+cd $PYPAW
+pip install -v -e .
+
+deactivate
+
+
+# To use the data processing suite after installation completes, 
+# first reload the virtual environment:
+# source $VENV/bin/activate
+
+# Then run the following example to generate sample data:
+# cd $PYPAW/examples/converter; ./example_run.bash
+
+# Now the remaining examples should work. For example,
+# to run the signal processing example:
+# cd $PYPAW/examples/signal_processing; ./example_run.bash
+
