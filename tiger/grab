@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# GRAB
+
+HOST_NAME="clover.princeton.edu"
+HOST_DIR="/home/rmodrak/.dropbox"
+
+# grab files from HOST_DIR
+if [ -n "$HOST_NAME" ];
+then
+    scp -r ${HOST_NAME}:${HOST_DIR}/* .
+else
+    cp -r $HOST_DIR/* .
+fi
+

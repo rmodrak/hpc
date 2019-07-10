@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# SEND
+
+HOST_NAME="clover.princeton.edu"
+HOST_DIR="/home/rmodrak/.dropbox"
+
+# clear HOST_DIR prior to sending files
+if true;
+then
+    if [ -n "$HOST_NAME" ];
+    then
+        ssh $HOST_NAME "rm -rf ${HOST_DIR}/*"
+    else 
+        rm -rf ${HOST_DIR}/*
+    fi
+fi
+
+# send files
+for file in "$@"
+do
+    if [ -n "$HOST_NAME" ];
+    then
+        scp -r "$file" "${HOST_NAME}:${HOST_DIR}"
+    else
+        cp -r "$file" "$HOST_DIR"
+    fi
+done
+
